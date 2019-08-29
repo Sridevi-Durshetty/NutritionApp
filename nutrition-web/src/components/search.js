@@ -72,7 +72,7 @@ class Search extends Component {
             {/* <button onClick={()=>this.handleFoodDetailClick(c)} >{c.food_name}</button> */}
             <button onClick={this.handleFoodName} value={c.food_name}>Click {c.food_name}</button>
         </div>)
-        const brandedFood = brandedFoodList.map(b => <div>
+        const brandedFood = brandedFoodList.map(b => <div>      
              <button onClick={this.handleFoodName} value={b.food_name}>{b.food_name}</button>
         </div>)
         return (
