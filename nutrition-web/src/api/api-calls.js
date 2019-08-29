@@ -52,7 +52,14 @@ export async function apiCallGet(url) {
 export async function apiCallPost(url, reqObj) {
     let resp;
     try {
-        resp = await axios.post(url, reqObj);
+        //resp = await axios.post(url, reqObj);
+        resp = await axios.post(url,reqObj, {
+            headers: {
+                'x-app-id': '06cffb84',
+                'x-app-key': '72280d9947c1dedad88a5876005e97fe',
+                'x-remote-user-id': '0'
+            }
+        });
     } catch (error) {
         const obj = JSON.stringify(error);
         console.log('in error is ', error);
