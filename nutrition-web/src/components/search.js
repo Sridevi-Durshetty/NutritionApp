@@ -79,8 +79,8 @@ class Search extends Component {
         console.log("ful url:", urls.BASE_URL + urls.SEARCH_URL + '?query=' + e.target.value)
         apiCallGet(urls.BASE_URL + urls.SEARCH_URL + '?query=' + e.target.value, '')
             .then(foods => {
-                console.log("foods :", foods.data["common"].slice(0, 5))
-                console.log("foods :", foods.data["branded"].slice(0, 5))
+                console.log("food- common :", foods.data["common"].slice(0, 5))
+                console.log("foods  - branded:", foods.data["branded"].slice(0, 5))
                 this.setState({
                     commonFoodList: foods.data["common"].slice(0, 5),
                     brandedFoodList: foods.data["branded"].slice(0, 5)
@@ -104,7 +104,7 @@ class Search extends Component {
     }
 
     handleClose = () => {
-        this.setState({ anchorEl: null });
+        this.setState({ anchorEl: null ,isFoodDetailOpen:false});
     }
 
 
@@ -153,7 +153,8 @@ class Search extends Component {
                     </List>
                 }
                 {/* {isFoodDetailOpen && <FoodDetails selectedDetailFoodName={selectedFoodName} />} */}
-
+                
+                {isFoodDetailOpen &&
                 <Popover id="popOverId"  open={open}  anchorEl={anchorEl}
                     onClose={this.handleClose}
                     anchorOrigin={{
@@ -165,8 +166,9 @@ class Search extends Component {
                         horizontal: 'center',
                     }}
                 >
-                   {isFoodDetailOpen && <FoodDetails selectedDetailFoodName={selectedFoodName} />}
+                   <FoodDetails selectedDetailFoodName={selectedFoodName} />
                 </Popover>
+                }
             </div>
         );
     }
