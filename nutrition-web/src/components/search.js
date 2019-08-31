@@ -13,6 +13,7 @@ import { withStyles } from '@material-ui/styles';
 import { makeStyles } from '@material-ui/core/styles';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
+import Popover from '@material-ui/core/Popover';
 import Button from '@material-ui/core/Button';
 //import '../styles/autocomplete.css'
 
@@ -35,7 +36,6 @@ const styles = makeStyles(theme => ({
 }));
 
 class Search extends Component {
-
     state = {
         // commonFood: {
         //     common_type: null,
@@ -64,10 +64,11 @@ class Search extends Component {
         commonFoodList: [],
         brandedFoodList: [],
         isFoodDetailOpen: false,
-        selectedFoodName: ''
+        selectedFoodName: '',
 
         // The active selection's index
         // activeSuggestion: 0
+        anchorEl: null
     }
 
     constructor(props) {
@@ -92,14 +93,24 @@ class Search extends Component {
         console.log("sel food name :", fName)
         this.setState({
             isFoodDetailOpen: true,
-            selectedFoodName: fName
+            selectedFoodName: fName,
+            anchorEl: fName
             //activeSuggestion: 0
         })
     }
 
+    handleClick = (event) => {
+        this.setState({ anchorEl: event.currentTarget });
+    }
+
+    handleClose = () => {
+        this.setState({ anchorEl: null });
+    }
+
+
     render() {
         const { classes } = this.props;
-        const { commonFoodList, brandedFoodList, isFoodDetailOpen, selectedFoodName } = this.state
+        const { commonFoodList, brandedFoodList, isFoodDetailOpen, selectedFoodName,anchorEl } = this.state
 
         commonFoodList.unshift('common')
         brandedFoodList.unshift('branded')
@@ -131,7 +142,8 @@ class Search extends Component {
             </React.Fragment>
         )
 
-
+        const open = Boolean(anchorEl);
+        // const id = open ? 'simple-popover' : undefined;
         return (
             <div className={classes.root}>
                 <TextField label="Search food" onChange={this.getFoodByName} />
@@ -140,7 +152,21 @@ class Search extends Component {
                         {filteredFoodList}
                     </List>
                 }
-                {isFoodDetailOpen && <FoodDetails selectedDetailFoodName={selectedFoodName} />}
+                {/* {isFoodDetailOpen && <FoodDetails selectedDetailFoodName={selectedFoodName} />} */}
+
+                <Popover id="popOverId"  open={open}  anchorEl={anchorEl}
+                    onClose={this.handleClose}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                    }}
+                >
+                   {isFoodDetailOpen && <FoodDetails selectedDetailFoodName={selectedFoodName} />}
+                </Popover>
             </div>
         );
     }
