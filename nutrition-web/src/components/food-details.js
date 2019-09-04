@@ -1,4 +1,4 @@
-import React,{Component} from 'react'
+import React, { Component } from 'react'
 import * as urls from '../api/endpoints';
 import {
     apiCallGet, apiCallPost
@@ -16,114 +16,151 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Divider from '@material-ui/core/Divider';
+import Grid from '@material-ui/core/Grid';
+// import OutlinedInput from '@material-ui/core/OutlinedInput';
+// import MenuItem from '@material-ui/core/MenuItem';
 
 const styles = makeStyles(theme => ({
     root: {
         padding: theme.spacing(3, 2),
+        display: 'flex',
+    flexWrap: 'wrap',
+    },
+    card: {
+        minWidth: 500,
+    },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120,
       },
-      card: {
-        minWidth: 275,
-      },
-      bullet: {
-        display: 'inline-block',
-        margin: '0 2px',
-        transform: 'scale(0.8)',
-      },
-      title: {
+    title: {
         fontSize: 14,
-      },
-      pos: {
+    },
+    pos: {
         marginBottom: 12,
+    },
+   
+    avatar: {
+        margin: 10,
+        width: 80,
+        height: 400,
       },
-    }));
+}));
 
 class FoodDetails extends Component {
-    state = { 
-        // commonFood: {
-        //     common_type: null,
-        //     food_name: '',
-        //     locale: '',
-        //     photo: { thumb: '' },
-        //     serving_qty: '',
-        //     serving_unit: '',
-        //     tag_id: '',
-        //     tag_name: ''
-        // },
-        // brandedFood: {
-        //     brand_name: '',
-        //     brand_name_item_name: '',
-        //     brand_type: 0,
-        //     food_name: '',
-        //     locale: '',
-        //     nf_calories: 0,
-        //     nix_brand_id: '',
-        //     nix_item_id: '',
-        //     photo: { thumb: '' },
-        //     region: 0,
-        //     serving_qty: 0,
-        //     serving_unit: ''
-        // }
-
-        intakeFood:{
-            'nix_item_id': '', 
+    state = {
+        intakeFood: {
+            'nix_item_id': '',
             'food_name': '',
             'serving_unit': '',
-            'serving_weight_grams':0,       
-            'serving_qty': 0,     
+            'serving_weight_grams': 0,
+            'serving_qty': '0',
             'nf_calories': 0,
-            'serving_size' :0, 
+            'serving_size': 0,
             'meal_type': 'breakfast',
-            'thumb': ''
+            'thumb': '',
+            "meal_type": [],         
+            "serving_size": [],
+            "selected_meal_type":"mealtype1"
         },
-        intakeFoodList:[]
-    
-     }
-     componentDidMount(){
+       selectedMealType:"mealtype1",
+        intakeFoodList: []
+    }
+  
+    componentDidMount() {
         //  console.log("selectedDetailFood :",this.props.selectedDetailFood)
-        console.log("selectedDetailFoodName :",this.props.selectedDetailFoodName)
-             
+        console.log("selectedDetailFoodName :", this.props.selectedDetailFoodName)
+
         // console.log('before add ', this.query);
-        apiCallPost(urls.BASE_URL + urls.NUTRIENTS_URL, {'query':this.props.selectedDetailFoodName} )
+        apiCallPost(urls.BASE_URL + urls.NUTRIENTS_URL, { 'query': this.props.selectedDetailFoodName })
             .then((resp) => {
-                    console.log("nutrient info:",resp.data.foods)                   
+                console.log("nutrient info:", resp.data.foods)
+                var entries = resp.data.foods
+                entries.map(f=>{
                     this.setState({
-                        // intakeFood:{
-                        //     'nix_item_id': '', 
-                        //     'food_name': '',
-                        //     'serving_unit': '',
-                        //     'serving_weight_grams':0,       
-                        //     'serving_qty': 0,     
-                        //     'nf_calories': 0,
-                        //     'serving_size' :0, 
-                        //     'meal_type': 'breakfast',
-                        //     'thumb': ''
-                        // }
-                        intakeFoodList:resp.data.foods
-                    })  
-                    console.log("intakeFoodList:",this.state.intakeFoodList)
+                        intakeFoodList:[{
+                            "nix_item_id":f.nix_item_id,
+                            "food_name":f.food_name,
+                            "serving_unit":f.serving_unit, // units like cup , slice, oz
+                            "serving_weight_grams":f.serving_weight_grams,
+                            "serving_qty": f.serving_qty,     // 0.5 cup or 1 slice - per serving quantity
+                            "nf_calories": f.nf_calories,                          
+                            "meal_type": [
+                                {id: "mealtype1", name: "Breakfast"},
+                                {id: "mealtype2", name: "Lunch"},
+                                {id: "mealtype3", name: "Snacks"},
+                                {id: "mealtype4", name: "Dinner"}],
+                            "thumb": f.photo["thumb"],
+                            "serving_size": [    // can show no of quantitites - user can select no of quantities eat 
+                                {id: f.serving_qty, name: 1*f.serving_qty},
+                                {id: 2*f.serving_qty, name: 2*f.serving_qty},
+                                {id: 3*f.serving_qty, name: 3*f.serving_qty}
+                            ],
+                            "selected_meal_type":"mealtype1", // selected meal type like breakfast, lunch
+                            "selected_serving_size":f.serving_qty // selected no of quantities user ate 
+                        }]
+                    })
+                })            
+               
+                console.log("intakeFoodList:", this.state.intakeFoodList)             
+                
             }).catch((err) => {
-            console.log('nutrients  error', err);
-            // this.setState({ status: err });
+                console.log('nutrients  error', err);
+                // this.setState({ status: err });
             });
 
-     }
-    render() { 
-        const {intakeFoodList} =this.state
-        const { classes } = this.props;
-        const bull = <span className={classes.bullet}>•</span>;
-    //   const intakeFood = intakeFoodList.map(inf=><div>
-    //       <p>Food Name: {inf.food_name}</p>
-    //       <p>calories: {inf.nf_calories}</p>
-    //       <p>Serving Qty: {inf.serving_qty}</p>
-    //       <p>Grams : {inf.serving_weight_grams}</p>
-    //       <p>Serving Unit : {inf.serving_unit}</p>
-    //       <p>Serving Size: {inf.serving_size}</p>
-    //       <p>Image : <img src={inf.photo.thumb} alt={inf.photo.thumb}></img></p>
-    //       <p>Meal Type : {inf.meal_type}</p>
-    //   </div>)
+    }
 
-    const intakeFood = intakeFoodList.map(inf=><div>
-        {/* <p>Food Name: {inf.food_name}</p>
+    handleChange =(selFood,e)=>{
+        console.log("selected fod",selFood)
+          const {name,value} = e.target  
+                console.log("Name :",name)
+                console.log("Value :",value)     
+        
+     const {intakeFoodList} ={...this.state}
+     const currentState = intakeFoodList  
+     currentState.map(i=>{
+         console.log("fooooood",i.food_name)
+         if(i.food_name === selFood.food_name )
+         {    
+           if(name ==="selected_serving_size") i.selected_serving_size = value;
+           if(name ==="selected_meal_type") i.selected_meal_type = value;
+         }
+     })
+
+    this.setState({intakeFoodList : currentState})
+   
+        console.log("currentState",this.state.intakeFoodList)
+   
+    }
+    addFood =(addfood)=>{
+    // const {name,value} =e.target  
+    const {intakeFood} = {...this.state} 
+    const currentState = intakeFood
+    currentState['nix_item_id'] = addfood.nix_item_id
+    currentState['food_name'] = addfood.food_name
+    currentState['serving_unit'] = addfood.serving_unit
+    currentState['serving_weight_grams'] = addfood.serving_weight_grams
+    currentState['serving_qty'] = addfood.serving_qty
+    currentState['nf_calories'] = addfood.nf_calories
+    currentState['serving_size'] = addfood.serving_size
+    currentState['meal_type'] = addfood.meal_type
+    this.setState({intakeFood : currentState})
+   
+    console.log("currentState",this.state.intakeFood)
+    console.log("selected food ",addfood)
+
+   
+}
+
+    render() {
+        const { intakeFoodList } = this.state
+        const { classes } = this.props;
+
+      
+
+        const intakeFood = intakeFoodList.map(inf => <div>
+            {/* <p>Food Name: {inf.food_name}</p>
         <p>calories: {inf.nf_calories}</p>
         <p>Serving Qty: {inf.serving_qty}</p>
         <p>Grams : {inf.serving_weight_grams}</p>
@@ -132,68 +169,94 @@ class FoodDetails extends Component {
         <p>Image : <img src={inf.photo.thumb} alt={inf.photo.thumb}></img></p>
         <p>Meal Type : {inf.meal_type}</p> */}
 
-        <Card className={classes.card}>
-        <CardContent>
-                        <Avatar
-                            alt={`Avatar-${inf.photo.thumb}`}
-                            src={inf.photo.thumb}
-                        />
-          <Typography variant="h5" component="h2">
-                {inf.food_name}
-          </Typography>
-          <Divider />
-                <FormControl className={classes.formControl}>
-                    <InputLabel htmlFor="servingSelect">Servings</InputLabel>
-                    <Select
-                    native
-                    value={inf.serving_qty}
-                  //  onChange={handleChange('age')}
-                    inputProps={{
-                        name: 'Servings',
-                        id: 'servingSelect',
-                    }}
-                    >
-                    <option value="" />
-                    <option value={1}>1</option>
-                    <option value={2}>2</option>
-                    <option value={3}>3</option>
-                    </Select>
-                    <Typography className={classes.pos} color="textSecondary">
-                        {inf.serving_unit}
+            <Card className={classes.card}>
+                <CardContent>
+                    <Avatar className={classes.avatar}
+                        alt={`Avatar-${inf.thumb}`}
+                        src={inf.thumb}
+                    />
+                    <Typography variant="h5" component="h1">
+                        {inf.food_name}
                     </Typography>
-            </FormControl>
-            <Divider />
-          <Typography variant="body2" component="p">
-            well meaning and kindly.
-            <br />
-            {'"a benevolent smile"'}
-          </Typography>
-        </CardContent>
-        <CardActions>
-          <Button size="small">Add</Button>
-        </CardActions>
-      </Card>
+                    <Divider />          
 
-    </div>)
-    
-        return ( 
+                        <Grid container spacing={2}>
+                            <Grid item xs={5}>
+                                <InputLabel htmlFor="servingSelect">Servings</InputLabel>
+                                <Select  native  value={inf.selected_serving_size}  onChange={(e)=>this.handleChange(inf,e)}
+                                    name ="selected_serving_size">
+                                    {
+                                        inf.serving_size.map((item) =>  
+                                        <option key={item.id} value={item.id}>{item.name}</option>)
+                                    }
+                               </Select> 
+                              
+                                <Typography className={classes.pos} color="textSecondary">
+                                    {inf.serving_unit}
+                                </Typography>
 
-        //     <Paper className={classes.root}>
-        //     <Typography variant="h5" component="h3">
-        //       Food Detail Page
-        //     </Typography>
-        //     <Typography component="p">
-        //       Paper can be used to build surface or other elements for your application.
-        //       {intakeFood}  
-        //         <Button >Add</Button>  
-        //     </Typography>
-        //   </Paper>  
-        
-        <Paper className={classes.root}>
-        {intakeFood} 
-       </Paper> 
-         );
+                            </Grid>
+
+                            <Grid item xs={3}>
+                                <Typography variant="h5" component="h2">
+                                    {inf.serving_weight_grams}
+                                </Typography>
+                                <Typography variant="body2" component="p">
+                                    Grams
+                                </Typography>
+
+                            </Grid>
+                            <Grid item xs={3}>
+                                <Typography variant="h5" component="h2">
+                                    {inf.nf_calories}
+                                </Typography>
+                                <Typography variant="body2" component="p">
+                                    Calories
+                                </Typography>
+
+                            </Grid>
+                            <Grid item xs={1}>
+                            </Grid>
+                        </Grid>
+                    <Divider />
+
+               
+                        <Grid container spacing={1}>
+                            <Grid item xs={12}>
+                                <Typography variant="body2" component="p">
+                                    <InputLabel htmlFor="serving_today">ADD TO TODAY</InputLabel> 
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={12}>                                                         
+                                <Select
+                                    native
+                                   value={inf.selected_meal_type}
+                                   onChange={(e)=>this.handleChange(inf,e)}                                 
+                                   name= "selected_meal_type"                    
+                                >
+                                     {
+                                        inf.meal_type.map((item) =>  
+                                        <option key={item.id} value={item.id}>{item.name}</option>)
+                                    }
+                                </Select>
+                            </Grid>
+                            </Grid>
+                            {/* </FormControl> */}
+                   
+                </CardContent>
+                <CardActions>
+                    <Button size="small" onClick={()=>this.addFood(inf)}>Add</Button>
+                </CardActions>
+            </Card>
+
+        </div>)
+
+        return (
+            <Paper className={classes.root}>
+                {intakeFood}
+            </Paper>
+        );
     }
-} 
+}
 
 export default withStyles(styles)(FoodDetails);
